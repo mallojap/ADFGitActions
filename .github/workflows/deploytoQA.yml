@@ -26,11 +26,12 @@ jobs:
       uses: actions/checkout@v1
         
     # Deployment of template    
-    - name: Deploy ARM Template
-      uses: azure/arm-deploy@v1
+    - name: Deploy resources
+      uses: azure/data-factory-deploy-action@v1.2.0
       with:
         # You can change these environment variables for your configuration:   AZURE_SUBSCRIPTION_ID, AZURE_RESOURCE_GROUP
-        subscriptionId: ${{ env.AZURE_SUBSCRIPTION_ID }}
+        # subscriptionId: ${{ env.AZURE_SUBSCRIPTION_ID }}
         resourceGroupName: ${{ env.AZURE_RESOURCE_GROUP }}
-        template: $GITHUB_WORKSPACE/azuredeploy.json  # Set this to the location of your template file
-        parameters: $GITHUB_WORKSPACE/azuredeploy.parameters.json # Set this to the location of your parameters file
+        dataFactoryName: "PM-ADFQA"
+        armTemplateFile: "myArmTemplate.json"
+        
