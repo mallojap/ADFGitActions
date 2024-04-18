@@ -32,7 +32,7 @@ jobs:
       with:
         # You can change these environment variables for your configuration:   AZURE_SUBSCRIPTION_ID, AZURE_RESOURCE_GROUP
         # subscriptionId: ${{ env.AZURE_SUBSCRIPTION_ID }}
-        resourceGroupName: ${{ env.AZURE_RESOURCE_GROUP }}
+        resourceGroupName: "ADFGithubActions"
         dataFactoryName: "PM-ADFQA"
         armTemplateFile: "${{ github.workspace }}/PM-ADFDev/ARMTemplateForFactory.json"
         
