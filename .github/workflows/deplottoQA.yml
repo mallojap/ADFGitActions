@@ -1,44 +1,40 @@
-name: workflow to deploy an ARM Template to a resource group
-on: push
-  
+# This is a basic workflow to help you deploy an ADF ARM template to a higher environment
 
-# CONFIGURATION
-# For help, go to https://github.com/Azure/Actions
+# For more information on GitHub Actions for Azure: https://github.com/Azure/Actions
+# For more samples to get started with GitHub Action workflows to deploy to Azure: https://github.com/Azure/actions-workflow-samples
 
-env:
-  AZURE_RESOURCE_GROUP: "ADFGithubActions"   # set this to your Azure Resource group's name  
-  AZURE_SUBSCRIPTION_ID: "d5af95fc-77ba-4fec-b542-923001f14ad6"   # set this to your Azure Subscription Id
-  
+on:
+  push:
+    branches:
+      - adf_publish
+  workflow_dispatch:
+
+
 jobs:
-  build-and-deploy-to-dev:
+  build:
     runs-on: ubuntu-latest
+    name: 'This deploys to QA'
     steps:
-                
-    # Authentication
-    # Set up the following secrets in your repository: AZURE_CREDENTIALS
-    # For details on usage of secrets, please refer https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets
+    - uses: actions/checkout@v3
+
     - name: Azure Login
-      uses: azure/login@v1
+      uses: Azure/login@v1.4.3
       with:
-        creds: ${{ secrets.AZURE_CREDENTIALS  }}
-    
-    # Checkout
-    - name: Checkout
-      uses: actions/checkout@v1
-      
-    - name: Get Data Factory Triggers
-      run: Get-AzDataFactoryV2Trigger -ResourceGroupName ADFGithubActions -DataFactoryName PM-ADFDev
-      env:
-        RESOURCE_GROUP_NAME: 'your-resource-group'
-        DATA_FACTORY_NAME: 'your-data-factory-name' 
+        # Paste output of `az ad sp create-for-rbac` as value of secret variable: AZURE_CREDENTIALS
+        creds: ${{secrets.AZURE_CREDENTIALS}}
         
-    # Deployment of template    
-    - name: Deploy resources
-      uses: azure/data-factory-deploy-action@v1.2.0
+    - name: Deploy Azure Resource Manager (ARM) Template
+      uses: Azure/arm-deploy@v1.0.6
       with:
-        # You can change these environment variables for your configuration:   AZURE_SUBSCRIPTION_ID, AZURE_RESOURCE_GROUP
-        # subscriptionId: ${{ env.AZURE_SUBSCRIPTION_ID }}
-        resourceGroupName: "ADFGithubActions"
-        dataFactoryName: "PM-ADFQA"
-        armTemplateFile: "${{ github.workspace }}/PM-ADFDev/ARMTemplateForFactory.json"
-        
+        # Provide the scope of the deployment. Valid values are: 'resourcegroup', 'managementgroup', 'subscription'
+        scope: 'resourcegroup'
+        # Target resource group of the deployment.
+        resourceGroupName: 'ADFGithubActions'
+        # Specify the path to the ADF ARM template. In this scenario, the workflow is in the same branch, 
+        # hence we only add the folder and arm template name to the path
+        template: ./PM-ADFDev/ARMTemplateForFactory.json
+        # Incremental (only add resources to resource group) or Complete (remove extra resources from resource group) or Validate (only validates the template).
+        deploymentMode: Incremental
+        # Supply deployment parameter values. In this simple scenario, 
+        # I am only passing the name of the target ADF to which this is being deployed
+        parameters: factoryName=PM-ADFQA
