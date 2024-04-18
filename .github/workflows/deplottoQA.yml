@@ -34,5 +34,5 @@ jobs:
         # subscriptionId: ${{ env.AZURE_SUBSCRIPTION_ID }}
         resourceGroupName: ${{ env.AZURE_RESOURCE_GROUP }}
         dataFactoryName: "PM-ADFQA"
-        armTemplateFile: "ARMTemplateForFactory.json"
+        armTemplateFile: "${{ github.workspace }}/PM-ADFDev/ARMTemplateForFactory.json"
         
