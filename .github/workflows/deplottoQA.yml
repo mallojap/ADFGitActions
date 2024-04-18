@@ -25,6 +25,12 @@ jobs:
     # Checkout
     - name: Checkout
       uses: actions/checkout@v1
+      
+    - name: Get Data Factory Triggers
+      run: Get-AzDataFactoryV2Trigger -ResourceGroupName ADFGithubActions -DataFactoryName PM-ADFDev
+      env:
+        RESOURCE_GROUP_NAME: 'your-resource-group'
+        DATA_FACTORY_NAME: 'your-data-factory-name' 
         
     # Deployment of template    
     - name: Deploy resources
